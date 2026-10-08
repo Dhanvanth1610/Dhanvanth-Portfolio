@@ -1,4 +1,4 @@
-## ✦ DHANVANTH SENTHIL KUMAR
+## ✦ DHANVANTH SENTHIL KUMAR'S PORTFOLIO
 
 [![Live site](https://img.shields.io/badge/LIVE-dhanvanth1610.github.io-7b5cff?style=for-the-badge&logo=githubpages&logoColor=white)](https://dhanvanth1610.github.io/Dhanvanth-Portfolio/)
 [![GitHub](https://img.shields.io/badge/GitHub-Dhanvanth1610-0d0a14?style=for-the-badge&logo=github)](https://github.com/Dhanvanth1610)
@@ -11,7 +11,6 @@
 ![No build step](https://img.shields.io/badge/build-none-4de8d0?style=flat-square)
 ![Single file](https://img.shields.io/badge/site-one_HTML_file-7b5cff?style=flat-square)
 
-<img src="assets/stack.svg" alt="Tech stack" width="100%">
 
 </div>
 
