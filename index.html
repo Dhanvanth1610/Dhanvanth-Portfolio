@@ -1,0 +1,933 @@
+<title>DhanvanthPortfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: floating-dock app shell over a live particle field; spotlight cards, tilt profile card, count-up stats. Single dark look on purpose. */
+:root{
+  color-scheme:dark;
+  --bg:#0d0a14; --surface:#16121f; --surface-2:#1d1829; --line:rgba(255,255,255,.08);
+  --fg:#f1eefa; --muted:#9d96b5; --accent:#7b5cff; --accent-rgb:123,92,255; --accent-soft:rgba(var(--accent-rgb),.16); --tint:color-mix(in srgb,var(--accent) 45%,#fff); --on-accent:#fff; --mint:#4de8d0;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Geist","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --l0:#1b1626; --l1:#3a2a78; --l2:#5b3fd1; --l3:#8a6bff; --l4:#c4b2ff;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:0 120px;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:8px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.glow{position:fixed;top:-20vh;left:50%;width:90vw;max-width:1100px;height:60vh;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(var(--accent-rgb),.28),transparent);filter:blur(30px);z-index:0;pointer-events:none}
+.shell{position:relative;z-index:1;max-width:1120px;margin-inline:auto}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;margin-bottom:8px;backdrop-filter:blur(14px);background:linear-gradient(var(--bg),rgba(13,10,20,.6))}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em}
+.brand i{width:26px;height:26px;border-radius:9px;background:conic-gradient(from 180deg,var(--accent),var(--mint),var(--accent));display:block;animation:spin 8s linear infinite}
+.top .ext{font-family:var(--f-mono);font-size:12.5px;color:var(--muted);border:1px solid var(--line);padding:7px 12px;border-radius:999px;transition:.2s;white-space:nowrap}
+.top .ext:hover{color:var(--fg);border-color:var(--accent)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* type */
+h1,h2,h3{font-family:var(--f-display);margin:0;letter-spacing:-.025em;text-wrap:balance}
+h1{font-size:clamp(34px,6vw,64px);line-height:1.02;font-weight:800}
+h2{font-size:22px;font-weight:700}
+h3{font-size:17px;font-weight:700}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gt{background:linear-gradient(100deg,var(--tint),var(--mint),var(--tint),var(--accent));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s ease-in-out infinite alternate}
+@keyframes shine{to{background-position:100% 0}}
+.lead{color:var(--muted);max-width:60ch;margin:14px 0 0}
+
+/* views */
+.view{animation:fade .45s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sec{margin-top:44px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sec-h a{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.sec-h a:hover{color:var(--mint)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,220px));gap:12px;margin-top:30px}
+.stat{padding:18px;border-radius:18px}
+.stat b{display:block;font-family:var(--f-display);font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:8px;color:var(--muted);font-size:13px}
+
+/* spotlight card */
+.spot{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:border-color .25s,transform .25s;--mx:50%;--my:50%}
+.spot::before{content:"";position:absolute;inset:0;background:radial-gradient(260px circle at var(--mx) var(--my),rgba(var(--accent-rgb),.28),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none}
+.spot:hover{border-color:rgba(var(--accent-rgb),.55)}
+.spot:hover::before{opacity:1}
+.spot>*{position:relative}
+
+/* repo cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:14px}
+.repo{padding:20px;display:flex;flex-direction:column;gap:12px;min-height:178px;animation:fade .5s ease both;animation-delay:calc(var(--i,0)*60ms)}
+.repo-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.repo-h a{font-family:var(--f-display);font-weight:700;font-size:17px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.repo-h a:hover{color:var(--tint)}
+.repo{cursor:pointer}
+.repo>.repo-h{position:static}
+.repo-h a{position:static}
+.repo-h a::after{content:"";position:absolute;inset:0;z-index:1;border-radius:20px}
+.repo-f .go{margin-left:auto;color:var(--mint);opacity:.75;transition:opacity .2s}
+.repo:hover .repo-f .go{opacity:1}
+.badge{font-family:var(--f-mono);font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge.fork{color:var(--mint);border-color:rgba(77,232,208,.35)}
+.badge.tpl{color:#ffcf6b;border-color:rgba(255,207,107,.35)}
+.repo p{margin:0;color:var(--muted);font-size:14px;flex:1}
+.repo-f{display:flex;gap:16px;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.topics{display:flex;gap:6px;flex-wrap:wrap}
+.topics span{font-size:11.5px;padding:2px 9px;border-radius:999px;background:var(--accent-soft);color:var(--tint)}
+
+/* heatmap */
+.heat{padding:20px}
+.heat-scroll{overflow-x:auto;padding-bottom:6px}
+.heat-grid{display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;grid-auto-columns:11px;gap:3px;width:max-content}
+.heat-grid i{border-radius:3px;background:var(--l0);transition:transform .15s,box-shadow .15s}
+.heat-grid i.today{outline:1px solid var(--mint);outline-offset:1px}
+.heat-grid i:hover{transform:scale(1.5);box-shadow:0 0 10px var(--accent);z-index:2;position:relative}
+.heat-f{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted);font-family:var(--f-mono);align-items:center}
+.legend{display:flex;gap:4px;align-items:center}
+.legend i{width:11px;height:11px;border-radius:3px;display:block}
+#tip{position:fixed;z-index:50;pointer-events:none;background:#000;border:1px solid var(--line);padding:5px 9px;border-radius:8px;font-family:var(--f-mono);font-size:12px;opacity:0;transition:opacity .12s;white-space:nowrap}
+
+/* quick links */
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.q{padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+.q b{font-family:var(--f-display);font-size:17px}
+.q span{color:var(--muted);font-size:13px}
+.q em{font-style:normal;font-family:var(--f-mono);font-size:12px;color:var(--mint)}
+
+/* profile */
+.profile{display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px;margin-top:20px;align-items:start}
+.pcard{padding:26px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);transform-style:preserve-3d;will-change:transform;transition:transform .15s ease-out}
+.ring{width:132px;height:132px;border-radius:50%;padding:4px;background:conic-gradient(from 0deg,var(--accent),var(--mint),#ff7ad9,var(--accent));animation:spin 7s linear infinite;display:grid;place-items:center}
+.ring div{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 30% 25%,#3b2a8f,#14101d 70%);display:grid;place-items:center;animation:spin 7s linear infinite reverse;font-family:var(--f-display);font-weight:800;font-size:42px;letter-spacing:-.04em}
+.ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.pcard h2{margin-top:18px;font-size:26px}
+.handle{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.bio{margin:14px 0;color:#cfc9e0;font-size:14.5px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 14px;border-radius:12px;background:var(--accent);color:var(--on-accent);font-weight:600;border:0;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 24px -8px rgba(var(--accent-rgb),.7)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px -8px rgba(var(--accent-rgb),.9)}
+.meta{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:9px;font-size:13.5px;color:var(--muted)}
+.meta li{display:flex;gap:10px}
+.meta b{color:var(--fg);font-weight:500}
+.fstat{display:flex;gap:18px;margin-top:18px;font-size:13px;color:var(--muted)}
+.fstat b{color:var(--fg);font-family:var(--f-display);font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.chips span{font-family:var(--f-mono);font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--tint);background:var(--accent-soft)}
+.ptabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:26px;overflow-x:auto}
+.ptabs button{background:none;border:0;padding:10px 14px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+.ptabs button.on{color:var(--fg);border-color:var(--accent)}
+.ptabs button:hover{color:var(--fg)}
+.pub{padding:22px;display:grid;gap:10px}
+.pub .tag{justify-self:start;font-family:var(--f-mono);font-size:11.5px;color:#0d0a14;background:var(--mint);padding:3px 10px;border-radius:999px;font-weight:500}
+
+/* contact */
+.contact{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;margin-top:28px;align-items:start}
+.cform{padding:24px;display:grid;gap:16px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px}
+.fld{display:grid;gap:6px;min-width:0}
+.fld label{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fld input,.fld select,.fld textarea{width:100%;min-width:0;background:var(--bg);border:1px solid var(--line);color:var(--fg);padding:12px 14px;border-radius:12px;font:inherit;transition:border-color .2s}
+.fld textarea{min-height:160px;resize:vertical}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.count{justify-self:end;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.c-actions{display:flex;gap:10px;flex-wrap:wrap}
+.c-actions .btn{width:auto;flex:1 1 170px;margin-top:0}
+.c-actions .btn.ghost{margin-top:0}
+[hidden]{display:none!important}
+.btn[aria-disabled="true"],.btn:disabled{opacity:.45;pointer-events:none;box-shadow:none}
+.hint{margin:0;font-size:13px;color:var(--muted)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.cinfo{padding:24px;display:grid;gap:14px}
+.cinfo .addr{font-family:var(--f-mono);font-size:14px;overflow-wrap:anywhere}
+.cta{padding:26px;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cta p{margin:6px 0 0;color:var(--muted);max-width:52ch}
+.cta .btn{width:auto;padding:12px 26px}
+@media (max-width:860px){.contact{grid-template-columns:minmax(0,1fr)}}
+
+/* extras */
+.top-r{display:flex;align-items:center;gap:14px}
+.sw{display:flex;gap:7px}
+.sw button{width:18px;height:18px;border-radius:50%;border:2px solid transparent;padding:0;box-shadow:0 0 0 1px var(--line);transition:transform .15s}
+.sw button:hover{transform:scale(1.2)}
+.sw button[aria-pressed="true"]{border-color:var(--fg)}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+#doms{flex-basis:100%}
+.pill small{font-family:var(--f-mono);font-size:11px;opacity:.65;margin-left:5px}
+.repo .repo-f{flex-wrap:wrap;gap:8px 16px}
+.repo-f .cp{position:relative;z-index:2;background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--f-mono);font-size:11.5px;padding:3px 10px;border-radius:999px;transition:.2s}
+.repo-f .cp:hover{color:var(--fg);border-color:var(--accent)}
+.lm-bar{display:flex;height:12px;border-radius:999px;overflow:hidden;gap:2px}
+.lm-bar i{display:block;min-width:6px}
+.lm-leg{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.lm-leg b{color:var(--fg);font-weight:500}
+.kb{color:var(--fg)}
+
+/* certificates */
+.cert-f{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.cert-f .kind{color:var(--tint);border-color:rgba(var(--accent-rgb),.4)}
+
+.cc{padding:18px 20px;display:grid;gap:8px;align-content:start}
+.cc h3{font-size:16px}
+.cc .org{font-family:var(--f-mono);font-size:12px;color:var(--mint)}
+
+/* resume */
+.open{display:inline-flex;gap:8px;align-items:center;margin-top:12px;font-family:var(--f-mono);font-size:12px;color:var(--mint)}
+.open::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(77,232,208,.6);animation:ping 2s ease-out infinite}
+@keyframes ping{to{box-shadow:0 0 0 9px rgba(77,232,208,0)}}
+.btn.ghost{margin-top:10px;background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--fg)}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:none}
+.rs{display:grid;gap:34px}
+.rs-top{padding:24px;display:grid;gap:12px}
+.rs-top .tag{justify-self:start;font-family:var(--f-mono);font-size:11.5px;color:#0d0a14;background:var(--mint);padding:3px 10px;border-radius:999px;font-weight:500}
+.rs-top p{margin:0;color:#cfc9e0}
+.rs-top .rs-role{color:var(--muted)}
+.rs-contact{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.rs-contact b{color:var(--fg);font-weight:500;overflow-wrap:anywhere}
+.rs-contact a{color:var(--mint)}
+.rs-list{display:grid;gap:14px}
+.rs-item{padding:20px;display:grid;gap:10px}
+.rs-item header{display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;align-items:baseline}
+.rs-item h3 a{color:inherit}
+.rs-item h3 a:hover{color:var(--tint)}
+.rs-item .stack{font-family:var(--f-mono);font-size:12px;color:var(--mint)}
+.rs-item ul{margin:0;padding-left:18px;color:#cfc9e0;font-size:14px;display:grid;gap:6px}
+.rs-item .sub{color:var(--muted);font-size:13.5px}
+.rs-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.rs-skill{padding:18px}
+.rs-skill b{display:block;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.rs-skill .chips{margin-top:0}
+
+.rs-top .btn.dl{width:auto;justify-self:start;padding:11px 22px;margin-top:6px}
+.dl-msg{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 96px);transform:translateX(-50%);z-index:40;background:#000;border:1px solid var(--line);padding:9px 16px;border-radius:12px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:calc(100vw - 32px)}
+
+/* marquee */
+.marq{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marq-t{display:flex;gap:12px;width:max-content;animation:marq 32s linear infinite}
+.marq:hover .marq-t{animation-play-state:paused}
+.marq-t span{padding:10px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-family:var(--f-display);font-weight:700;font-size:15px;white-space:nowrap}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* repos view */
+.tools{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 18px;align-items:center}
+.tools input{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--line);color:var(--fg);padding:12px 16px;border-radius:14px;font:inherit}
+.tools input:focus{outline:none;border-color:var(--accent)}
+.pill{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;color:var(--muted);transition:.2s}
+.pill.on,.pill:hover{color:var(--fg);border-color:var(--accent);background:var(--accent-soft)}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+
+/* dock */
+.dock{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);z-index:30;display:flex;align-items:flex-end;gap:10px;padding:10px 12px;border-radius:22px;background:rgba(22,18,31,.78);backdrop-filter:blur(18px);border:1px solid var(--line);box-shadow:0 20px 50px -10px #000}
+.dk{position:relative;display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:var(--surface-2);border:1px solid var(--line);transform-origin:bottom center;transition:transform .12s ease-out,border-color .2s}
+.dk svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:var(--muted)}
+.dk.on{border-color:var(--accent)}
+.dk.on svg{color:#fff}
+.dk.on::after{content:"";position:absolute;bottom:-7px;width:5px;height:5px;border-radius:50%;background:var(--mint)}
+.dk span{position:absolute;bottom:calc(100% + 10px);background:#000;padding:3px 9px;border-radius:8px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .15s;white-space:nowrap}
+.dk:hover span{opacity:1}
+
+.note{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;font-family:var(--f-mono)}
+
+@media (max-width:860px){
+  .profile{grid-template-columns:minmax(0,1fr)}
+  .pcard{position:static}
+}
+@media (max-width:420px){
+  .brand{font-size:16px}
+  .sw{gap:5px}
+  .top-r{gap:8px}
+  .dock{gap:6px;padding:8px}
+  .dk{width:46px;height:46px}
+  .top .ext{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="glow" aria-hidden="true"></div>
+<div id="tip"></div>
+<div class="dl-msg" id="dl-msg" role="status" aria-live="polite"></div>
+
+<div class="shell">
+  <header class="top">
+    <div class="brand"><i></i>DhanvanthPortfolio</div>
+    <div class="top-r">
+      <div class="sw" id="sw" role="group" aria-label="Accent colour"></div>
+      <a class="ext" href="https://github.com/Dhanvanth1610" target="_blank" rel="noopener">github.com/Dhanvanth1610 ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="v-home" class="view">
+      <div class="eyebrow" id="today"></div>
+      <h1 style="margin-top:10px"><span id="greet">Welcome back</span>,<br><span class="gt" id="scr">Dhanvanth</span></h1>
+      <p class="lead">Your GitHub work in one place: vision models, real-time engines, medical ML and full-stack products.</p>
+
+      <div class="stats">
+        <div class="stat spot"><b data-n="11">0</b><span>Public repositories</span></div>
+        <div class="stat spot"><b data-n="6">0</b><span>Pinned projects</span></div>
+        <div class="stat spot"><b data-n="1">0</b><span>Published paper</span></div>
+        <div class="stat spot"><b id="stat-certs" data-n="7">0</b><span>Certificates</span></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><h2>Pinned projects</h2><a href="#repos" data-go="repos">All repositories →</a></div>
+        <div class="grid" data-repos="pinned"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><h2>Language mix</h2></div>
+        <div class="heat spot" id="langmix"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><h2>Certificates</h2><a href="#profile" data-go="profile" data-after="certs">All certificates →</a></div>
+        <div class="grid" id="home-certs"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><h2>Contribution activity</h2></div>
+        <div class="heat spot" data-heat></div>
+      </div>
+
+      <div class="sec">
+        <div class="cta spot">
+          <div><h2>Hiring or collaborating?</h2><p>Open to software engineering and ML/AI internships. Write your message here and send it to Dhanvanth's inbox in one click from your own email.</p></div>
+          <button class="btn" type="button" data-go="contact">Write a message</button>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-h"><h2>Resume</h2></div>
+        <div class="quick">
+          <a class="q spot" href="#profile" data-resume><b>Resume</b><span>Education, projects, skills and achievements</span><em>Open the resume tab →</em></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="v-profile" class="view" hidden>
+      <div class="profile">
+        <aside class="pcard spot tilt">
+          <div class="ring"><div><img src="assets/avatar.jpg" alt="Dhanvanth SenthilKumar" width="360" height="360"></div></div>
+          <h2>Dhanvanth SenthilKumar</h2>
+          <div class="handle">@Dhanvanth1610</div>
+          <span class="open">Open to internships</span>
+          <p class="bio">Pre-final year B.Tech student in AI &amp; Data Science who builds end-to-end systems, from signal processing and computer vision to REST APIs and React front ends. Published at ICACIT 2025.</p>
+          <a class="btn" href="https://github.com/Dhanvanth1610" target="_blank" rel="noopener">Follow on GitHub ↗</a>
+          <button class="btn ghost" type="button" data-ptab="resume">View resume</button>
+          <button class="btn ghost" type="button" data-go="contact">Contact me</button>
+          <button class="btn ghost" type="button" data-dl hidden>⬇ Download resume (PDF)</button>
+          <ul class="meta">
+            <li>🎓 <b>Dr. N.G.P. Institute of Technology, Coimbatore</b></li>
+            <li>🧭 <b>Joint Secretary, Dept. of AI &amp; DS Association</b></li>
+            <li>📅 <b>On GitHub since Feb 2026</b></li>
+          </ul>
+          <div class="chips"><span>FastAPI</span><span>Node.js</span><span>React</span><span>MongoDB</span><span>XGBoost</span><span>scikit-learn</span></div>
+        </aside>
+
+        <div>
+          <div class="ptabs" role="tablist">
+            <button class="on" data-ptab="overview">Overview</button>
+            <button data-ptab="repos">Repositories</button>
+            <button data-ptab="research">Research</button>
+            <button data-ptab="resume">Resume</button>
+            <button data-ptab="certs">Certificates</button>
+          </div>
+
+          <div data-pane="overview">
+            <div class="sec-h" style="margin-top:0"><h2>Pinned</h2></div>
+            <div class="grid" data-repos="pinned"></div>
+
+            <div class="sec">
+              <div class="sec-h"><h2>Stack</h2></div>
+              <div class="marq"><div class="marq-t" id="marq"></div></div>
+            </div>
+
+            <div class="sec">
+              <div class="sec-h"><h2>Activity</h2></div>
+              <div class="heat spot" data-heat></div>
+            </div>
+          </div>
+
+          <div data-pane="repos" hidden>
+            <div class="grid" data-repos="all2"></div>
+          </div>
+
+          <div data-pane="resume" hidden><div class="rs" id="resume"></div></div>
+
+          <div data-pane="certs" hidden>
+            <div class="sec-h" style="margin-top:0"><h2>Certificates</h2><a href="https://www.linkedin.com/in/dhanvanth-senthil-kumar-8b1ab6329/recent-activity/all/" target="_blank" rel="noopener">Posts on LinkedIn ↗</a></div>
+            <div id="cert-f" class="pills" style="margin-bottom:16px"></div>
+            <div class="rs-list" id="certs"></div>
+          </div>
+
+          <div data-pane="research" hidden>
+            <div class="pub spot">
+              <span class="tag">Published · ICACIT 2025</span>
+              <h3>Asteroid Impact Detection System</h3>
+              <p style="margin:0;color:var(--muted)">Paper presented at ICACIT 2025. The accompanying project calculates crater size and impact velocity to analyse what an asteroid strike does to the Earth's surface.</p>
+              <a href="https://github.com/Dhanvanth1610/Asteroid-Impact-Detection-System" target="_blank" rel="noopener" style="color:var(--mint);font-family:var(--f-mono);font-size:13px">View the code ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPOS -->
+    <section id="v-repos" class="view" hidden>
+      <div class="eyebrow">Repositories</div>
+      <h1 style="margin-top:10px">Everything <span class="gt">you've built</span></h1>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Find a repository…" aria-label="Find a repository">
+        <div id="langs" class="pills"></div>
+        <div id="doms" class="pills"></div>
+      </div>
+      <div class="grid" id="repo-list"></div>
+      <div class="empty" id="none" hidden>No repository matches that search.</div>
+      <p class="note" id="repo-note"></p>
+    </section>
+    <!-- CONTACT -->
+    <section id="v-contact" class="view" hidden>
+      <div class="eyebrow">Contact</div>
+      <h1 style="margin-top:10px">Hiring? <span class="gt">Say hello</span></h1>
+      <p class="lead">Open to software engineering and ML/AI internships, and to collaboration on research or products. Write a few lines below and your message opens as a ready-to-send email to Dhanvanth.</p>
+
+      <div class="contact">
+        <form class="cform spot" id="cform" novalidate autocomplete="on">
+          <div class="row2">
+            <div class="fld"><label for="c-name">Your name</label><input id="c-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Priya Raman" required></div>
+            <div class="fld"><label for="c-email">Your email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="120" placeholder="priya@company.com" required></div>
+          </div>
+          <div class="row2">
+            <div class="fld"><label for="c-org">Company (optional)</label><input id="c-org" name="org" type="text" autocomplete="organization" maxlength="80" placeholder="Company or team"></div>
+            <div class="fld"><label for="c-type">What is this about?</label>
+              <select id="c-type" name="type"><option>Hiring</option><option>Internship</option><option>Collaboration</option><option>Something else</option></select></div>
+          </div>
+          <div class="fld"><label for="c-msg">Message</label>
+            <textarea id="c-msg" name="msg" maxlength="1500" placeholder="Hi Dhanvanth, we are hiring for … and your work on … caught our eye. Could we talk this week?"></textarea>
+            <span class="count" id="c-count">0 / 1500</span></div>
+          <div class="c-actions">
+            <button class="btn" id="c-send" type="submit" hidden disabled>Send message</button>
+            <a class="btn" id="c-gmail" target="_blank" rel="noopener" aria-disabled="true">Open in Gmail ↗</a>
+            <a class="btn ghost" id="c-mailto" aria-disabled="true">Open in mail app</a>
+            <button class="btn ghost" id="c-copy" type="button" disabled>Copy message</button>
+          </div>
+          <p class="hint" id="c-hint" role="status" aria-live="polite"></p>
+          <div class="hp" aria-hidden="true"><label>Leave this empty<input id="c-hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off"></label></div>
+          <p class="hint" id="c-note">This page cannot send email by itself. Gmail opens with your message filled in; press Send there and it goes straight to Dhanvanth's inbox.</p>
+        </form>
+
+        <aside class="cinfo spot">
+          <h3>Email directly</h3>
+          <div class="addr" id="c-addr">dhanvanthlinkedin@gmail.com</div>
+          <button class="btn ghost" type="button" data-copytext="dhanvanthlinkedin@gmail.com" style="margin-top:0">Copy address</button>
+          <div class="eyebrow" style="margin-top:6px">Good topics</div>
+          <div class="chips" style="margin-top:0"><span>Internships</span><span>Full-time roles</span><span>Research</span><span>Collaboration</span></div>
+          <div class="eyebrow" style="margin-top:6px">Elsewhere</div>
+          <ul class="meta" style="margin-top:0">
+            <li><a href="https://github.com/Dhanvanth1610" target="_blank" rel="noopener" style="color:var(--mint)">GitHub · Dhanvanth1610 ↗</a></li>
+            <li><a href="https://www.linkedin.com/in/dhanvanth-senthil-kumar-8b1ab6329" target="_blank" rel="noopener" style="color:var(--mint)">LinkedIn · dhanvanth-senthil-kumar-8b1ab6329 ↗</a></li>
+            <li><button class="btn ghost" type="button" data-go="profile" data-after="resume" style="margin-top:0">See the resume</button></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <p class="note"><span class="kb">Shortcuts: 1 Home · 2 Profile · 3 Repositories · 4 Contact · / search</span><br>Repositories, pinned items and descriptions come from your public GitHub profile. The activity grid is a sample pattern; GitHub does not expose live contribution data to this page.</p>
+</div>
+
+<nav class="dock" id="dock" aria-label="Main">
+  <button class="dk on" data-go="home" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Home</span></button>
+  <button class="dk" data-go="profile" aria-label="Profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><span>Profile</span></button>
+  <button class="dk" data-go="repos" aria-label="Repositories"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/><path d="M9 7h6"/></svg><span>Repositories</span></button>
+  <button class="dk" data-go="contact" aria-label="Contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></button>
+</nav>
+
+<script>
+(function(){
+var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var U = "https://github.com/Dhanvanth1610/";
+var LANG = {HTML:"#e34c26", JavaScript:"#f1e05a", Python:"#3572a5"};
+var REPOS = [
+ {n:"KickSense", pin:1, d:"AI-powered football performance & tactical analysis platform. Computer-vision pipeline (YOLOv8 + ByteTrack) turns match footage into player heatmaps, pass networks, sprint/fatigue metrics and an xG model, with a full React dashboard.", l:"HTML", c:["Computer vision"], t:["YOLOv8","ByteTrack","xG model","React"]},
+ {n:"SyncVerse", pin:1, d:"Server-authoritative real-time multiplayer sync engine with client-side prediction, delta broadcasting and LLM-driven NPCs.", l:"JavaScript", c:["Real-time"], t:["Real-time","Delta broadcasting","LLM NPCs"]},
+ {n:"ECG-Arrhythmia-Classifier", pin:1, d:"From-scratch ML pipeline that classifies 17 types of cardiac arrhythmia from single-lead ECG signals. 91.3% cross-validated accuracy via hand-engineered signal features (HRV, spectral, wavelet) and an RF/SVM/XGBoost ensemble.", l:"HTML", lic:"MIT", c:["Medical AI"], t:["ML","Signal processing","XGBoost"]},
+ {n:"RadPulse-AI-Medical-Imaging-Suite", pin:1, d:"AI-powered medical imaging platform for chest X-ray and CT scan classification using DenseNet-121, advanced preprocessing, ensemble inference and attention heatmap visualization.", l:"Python", lic:"MIT", c:["Medical AI","Computer vision"], t:["DenseNet-121","Attention heatmaps","Ensemble inference"]},
+ {n:"Asteroid-Impact-Detection-System", pin:1, d:"Analyzes asteroid impacts on the Earth's surface by calculating crater size and velocity to determine impact aspects.", l:"HTML", fork:true, forks:1, c:["Research"], t:["ICACIT 2025","Crater size","Impact velocity"]},
+ {n:"ElevenIQ", pin:1, d:"AI-powered football analytics platform that combines live league data with computer vision to deliver intelligent match and player insights.", l:"JavaScript", tpl:true, c:["Computer vision","Full-stack"], t:["React","FastAPI","xG Lab","Match Center"]},
+ {n:"MedScope-AI-Clinical-Data-Module", d:"Explainable AI screening for heart disease and stroke risk. Scikit-learn pipelines served through a FastAPI backend and web dashboard, returning risk predictions with the top factors behind each one.", l:"Python", lic:"MIT", c:["Medical AI","Full-stack"], t:["Explainable AI","scikit-learn","FastAPI"]},
+ {n:"Employee-Allocation-System", d:"AI-assisted Employee Skill & Project Allocation System. Skill matching, resource allocation and workforce management on MongoDB, Beanie and Pydantic, with JWT auth and role-based portals.", l:"JavaScript", lic:"MIT", c:["Full-stack"], t:["Skill matching","FastAPI","MongoDB","JWT"]},
+ {n:"CloudMart", d:"E-commerce app on Node.js, Express and MongoDB. Replaces a localStorage demo with real persistence, bcrypt and JWT authentication, server-side checkout validation and role-based admin access.", l:"JavaScript", c:["Full-stack"], t:["Node.js","Express","MongoDB","JWT"]},
+ {n:"Leetcode-Tracker", d:"LeetCode solutions organised by problem number, some in more than one language. Doubles as the class practice tracker.", l:null, x:"410 commits", c:["Practice & tooling"], t:["LeetCode","DSA"]},
+ {n:"github-badge", d:"Forked from drngpit/github-badge. A Node.js script and CI workflow that generate an auto-updating SVG badge showing a user's repository count.", l:null, fork:true, c:["Practice & tooling"], t:["SVG badge","GitHub Actions"]}
+];
+var ACC = "123,92,255";
+var RESUME_PDF_URL="Dhanvanth_Resume.pdf";
+var SKILLS = ["Python","JavaScript","FastAPI","Node.js","Express","React","MongoDB","Beanie","XGBoost","scikit-learn","YOLOv8","ByteTrack","MediaPipe","TensorFlow Lite","1D-CNN","Edge AI"];
+
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+function card(r,i){
+  var badge = r.fork ? '<span class="badge fork">Fork</span>' : r.tpl ? '<span class="badge tpl">Template</span>' : '<span class="badge">Public</span>';
+  var topics = r.t.length ? '<div class="topics">'+r.t.map(function(x){return '<span>'+esc(x)+'</span>'}).join("")+'</div>' : "";
+  var lang = r.l ? '<span><i class="dot" style="background:'+LANG[r.l]+'"></i>'+r.l+'</span>' : "";
+  return '<article class="repo spot" style="--i:'+i+'">'
+   +'<div class="repo-h"><a href="'+U+r.n+'" target="_blank" rel="noopener" aria-label="Open '+esc(r.n)+' on GitHub">'+esc(r.n)+'</a>'+badge+'</div>'
+   +'<p>'+esc(r.d)+'</p>'+topics
+   +'<div class="repo-f">'+lang
+   +(r.lic?'<span>⚖ '+r.lic+'</span>':'')+(r.forks?'<span>⑂ '+r.forks+'</span>':'')+(r.x?'<span>'+esc(r.x)+'</span>':'')
+   +'<button class="cp" type="button" data-copy="'+esc(r.n)+'" aria-label="Copy clone URL for '+esc(r.n)+'">Copy clone URL</button>'
+   +'<span class="go">Open on GitHub ↗</span></div></article>';
+}
+function fillRepos(){
+  $$("[data-repos]").forEach(function(g){
+    var list = g.dataset.repos==="pinned" ? REPOS.filter(function(r){return r.pin}) : REPOS;
+    g.innerHTML = list.map(card).join("");
+  });
+}
+
+/* heatmap (sample pattern, rolls forward with today's date) */
+function hsh(n,salt){ var x=Math.imul(n^salt,2246822519); x^=x>>>13; x=Math.imul(x,3266489917); x^=x>>>16; return (x>>>0)/4294967296; }
+function heat(){
+  var now = new Date(), today = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var start = new Date(today.getFullYear(),today.getMonth(),today.getDate()-(52*7+today.getDay()));
+  var cells = "";
+  for(var d=new Date(start); d<=today; d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)){
+    var dn = Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000);
+    var wk = Math.floor(dn/7), dow = d.getDay();
+    var burst = Math.max(0, Math.sin(wk/5.5)+0.35) * (0.55 + hsh(wk,7)*0.6);
+    var chance = Math.min(0.92, burst*((dow===0||dow===6)?0.55:0.95));
+    var lvl = 0;
+    if(hsh(dn,1) < chance){ var q = hsh(dn,2); lvl = q<.4?1:q<.7?2:q<.9?3:4; }
+    var isToday = d.getTime()===today.getTime();
+    cells += '<i'+(isToday?' class="today"':'')+' data-l="'+lvl+'" data-d="'+d.toDateString()+(isToday?' (today)':'')+'" style="background:var(--l'+lvl+')"></i>';
+  }
+  var html = '<div class="heat-scroll"><div class="heat-grid">'+cells+'</div></div>'
+    +'<div class="heat-f"><span>Sample pattern, last 12 months, ending today</span><span class="legend">Less <i style="background:var(--l0)"></i><i style="background:var(--l1)"></i><i style="background:var(--l2)"></i><i style="background:var(--l3)"></i><i style="background:var(--l4)"></i> More</span></div>';
+  $$("[data-heat]").forEach(function(h){ h.innerHTML = html; var sc=$(".heat-scroll",h); sc.scrollLeft = sc.scrollWidth; });
+}
+var tip = $("#tip");
+document.addEventListener("mousemove",function(e){
+  var t = e.target;
+  if(t.matches && t.matches(".heat-grid i")){
+    tip.textContent = t.dataset.d + " · sample level " + t.dataset.l;
+    tip.style.left = (e.clientX+12)+"px"; tip.style.top = (e.clientY-34)+"px"; tip.style.opacity = 1;
+  } else tip.style.opacity = 0;
+  var s = t.closest && t.closest(".spot");
+  if(s){ var b=s.getBoundingClientRect(); s.style.setProperty("--mx",(e.clientX-b.left)+"px"); s.style.setProperty("--my",(e.clientY-b.top)+"px"); }
+});
+
+/* marquee */
+$("#marq").innerHTML = SKILLS.concat(SKILLS).map(function(s){return "<span>"+s+"</span>"}).join("");
+
+/* scramble */
+function scramble(el,final){
+  if(RM){ el.textContent = final; return; }
+  var ch="!<>-_/[]{}=+*^?#", f=0, tot=22;
+  clearInterval(el._t);
+  el._t = setInterval(function(){
+    var out="";
+    for(var i=0;i<final.length;i++){ out += (i < final.length*f/tot) ? final[i] : ch[Math.floor(Math.random()*ch.length)]; }
+    el.textContent = out; f++;
+    if(f>tot){ clearInterval(el._t); el.textContent = final; }
+  },32);
+}
+var scr = $("#scr"); scr.addEventListener("mouseenter",function(){scramble(scr,"Dhanvanth")});
+
+/* count up */
+function countUp(root){
+  $$("[data-n]",root).forEach(function(el){
+    var n = +el.dataset.n;
+    if(RM){ el.textContent = n; return; }
+    var t0 = performance.now();
+    (function step(t){
+      var p = Math.min(1,(t-t0)/900), e = 1-Math.pow(1-p,3);
+      el.textContent = Math.round(n*e);
+      if(p<1) requestAnimationFrame(step);
+    })(t0);
+  });
+}
+
+/* router */
+var VIEWS = ["home","profile","repos","contact"];
+function show(id){
+  if(VIEWS.indexOf(id)<0) id="home";
+  VIEWS.forEach(function(v){ var s=$("#v-"+v); s.hidden = v!==id; });
+  $$(".dk").forEach(function(b){ b.classList.toggle("on", b.dataset.go===id); });
+  try{ history.replaceState(null,"","#"+id); }catch(e){}
+  var v = $("#v-"+id);
+  v.style.animation="none"; void v.offsetWidth; v.style.animation="";
+  countUp(v);
+  if(id==="home") scramble(scr,"Dhanvanth");
+  window.scrollTo(0,0);
+}
+document.addEventListener("click",function(e){
+  var ct = e.target.closest("[data-copytext]");
+  if(ct){
+    e.preventDefault();
+    var txt = ct.dataset.copytext;
+    copyText(txt).then(function(){ toast("Email address copied"); },function(){ toast(txt); });
+    return;
+  }
+  var cp = e.target.closest("[data-copy]");
+  if(cp){
+    e.preventDefault();
+    var url = U+cp.dataset.copy+".git";
+    var p = (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(url) : Promise.reject();
+    p.then(function(){ toast("Clone URL copied"); },function(){ toast(url); });
+    return;
+  }
+  var g = e.target.closest("[data-go]");
+  if(g){ e.preventDefault(); show(g.dataset.go); if(g.dataset.after) openTab(g.dataset.after); return; }
+  var r = e.target.closest("[data-resume]");
+  if(r){ e.preventDefault(); show("profile"); openTab("resume"); }
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  var t = e.target, tag = t && t.tagName;
+  if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)) return;
+  if(e.key==="1") show("home"); else if(e.key==="2") show("profile"); else if(e.key==="3") show("repos"); else if(e.key==="4") show("contact");
+  else if(e.key==="/"){ e.preventDefault(); show("repos"); $("#q").focus(); }
+});
+
+/* profile tabs */
+function openTab(name){
+  $$(".ptabs [data-ptab]").forEach(function(x){ x.classList.toggle("on", x.dataset.ptab===name); });
+  $$("[data-pane]").forEach(function(p){ p.hidden = p.dataset.pane !== name; });
+}
+$$("[data-ptab]").forEach(function(b){
+  b.addEventListener("click",function(){
+    openTab(b.dataset.ptab);
+    if(!b.closest(".ptabs")) $(".ptabs").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});
+  });
+});
+
+/* resume */
+function renderResume(){
+  var P = [
+   {n:"ECG Arrhythmia Classifier", s:"Python · scikit-learn · XGBoost", href:U+"ECG-Arrhythmia-Classifier", b:[
+     "From-scratch ML pipeline (no pretrained models) classifying 17 cardiac arrhythmia types from single-lead ECG at 91.3% cross-validated accuracy.",
+     "Engineered 41 features per recording (HRV, spectral, wavelet) over 1,000 signals; Random Forest / SVM / XGBoost ensemble. Built at a hackathon at VIT Vellore."]},
+   {n:"Employee Skill & Project Allocation System", s:"FastAPI · MongoDB · Beanie · JWT", href:U+"Employee-Allocation-System", b:[
+     "Role-based full-stack platform with a skill-matching engine that ranks best-fit candidates for each project.",
+     "Clean layered backend (routes, schemas, services, models) with versioned /api/v1 endpoints, async FastAPI and Pydantic validation."]},
+   {n:"ElevenIQ: Football Analytics and League Center", s:"YOLOv8 · FastAPI · React · MongoDB", href:U+"ElevenIQ", b:[
+     "Match analysis: player detection and tracking (YOLOv8 + ByteTrack), pitch homography, heatmaps, pass networks, sprint/fatigue metrics and an xG model.",
+     "League Center with live standings, fixtures and results for the top-5 leagues and Champions League, auto-refreshing every 60 seconds."]},
+   {n:"Real-Time Neurological Tremor Detection", s:"MediaPipe · TFLite · 1D-CNN", b:[
+     "Edge-AI camera system detecting tremors in real time with MediaPipe landmarks and a lightweight 1D-CNN on TensorFlow Lite; prepared IEEE-format base papers."]},
+   {n:"Asteroid Impact Detection System", s:"ICACIT 2025", href:U+"Asteroid-Impact-Detection-System", b:[
+     "Published a paper at ICACIT 2025 on an asteroid impact detection system."]}
+  ];
+  var projects = P.map(function(p){
+    var t = p.href ? '<a href="'+p.href+'" target="_blank" rel="noopener">'+esc(p.n)+' ↗</a>' : esc(p.n);
+    return '<article class="rs-item spot"><header><h3>'+t+'</h3><span class="stack">'+esc(p.s)+'</span></header><ul>'+p.b.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></article>';
+  }).join("");
+  var skills = [
+   ["Languages",["Python","JavaScript"]],
+   ["Backend and data",["FastAPI","Node.js","Express","REST APIs","JWT auth","Pydantic","MongoDB","Beanie"]],
+   ["Frontend",["React"]],
+   ["ML and CV",["scikit-learn","XGBoost","YOLOv8","ByteTrack","MediaPipe","TensorFlow Lite","1D-CNN","Signal processing","Causal uplift modeling"]],
+   ["Tools",["Git","GitHub Actions","aiogram (Telegram bots)","Canva"]],
+   ["Languages spoken",["English","Telugu","Tamil"]]
+  ].map(function(k){
+    return '<div class="rs-skill spot"><b>'+k[0]+'</b><div class="chips">'+k[1].map(function(x){return '<span>'+esc(x)+'</span>'}).join("")+'</div></div>';
+  }).join("");
+  function item(h,sub,bul,right){
+    return '<article class="rs-item spot"><header><h3>'+h+'</h3>'+(right?'<span class="stack">'+right+'</span>':'')+'</header>'+(sub?'<div class="sub">'+sub+'</div>':'')+(bul?'<ul>'+bul.map(function(x){return '<li>'+x+'</li>'}).join("")+'</ul>':'')+'</article>';
+  }
+  $("#resume").innerHTML =
+   '<div class="rs-top spot"><span class="tag">Seeking a Software Engineering or ML/AI internship</span>'
+   +'<h2 style="font-size:30px">Dhanvanth</h2><p class="rs-role">AI &amp; Data Science Student | Full-Stack and Machine Learning Developer</p>'
+   +'<p>Pre-final year B.Tech AI &amp; Data Science student who builds end-to-end systems, from signal-processing and computer-vision models to REST APIs and React front ends. Published researcher (ICACIT 2025), hackathon participant and Joint Secretary of the Department of AI &amp; Data Science association (ALZENIXX).</p>'
+   +'<ul class="rs-contact"><li>📍 <b>Coimbatore, India</b></li><li>✉ <b>24243020@drngpit.ac.in</b></li><li>☎ <b>+91 87547 39428</b></li>'
+   +'<li><a href="https://github.com/Dhanvanth1610" target="_blank" rel="noopener">GitHub · Dhanvanth1610 ↗</a></li>'
+   +'<li><a href="https://www.linkedin.com/in/dhanvanth-senthil-kumar-8b1ab6329" target="_blank" rel="noopener">LinkedIn · dhanvanth-senthil-kumar-8b1ab6329 ↗</a></li></ul><button class="btn dl" type="button" data-dl hidden>⬇ Download resume (PDF)</button></div>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Education</h2></div>'+item("B.Tech, Artificial Intelligence and Data Science","Dr. N.G.P. Institute of Technology, Coimbatore",null,"2024 – 2028")+'</section>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Projects</h2></div><div class="rs-list">'+projects+'</div></section>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Technical skills</h2></div><div class="rs-two">'+skills+'</div></section>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Leadership and activities</h2></div><div class="rs-list">'
+     +item("Joint Secretary, Dept. of AI &amp; Data Science (ALZENIXX)","Dr. N.G.P. Institute of Technology",["Designed the ALZENIXX department handbook and the INSIGHTX magazine in Canva, with unique editorial layouts per page and real event content."])
+     +item('<a href="'+U+'Leetcode-Tracker" target="_blank" rel="noopener">Class LeetCode Tracker ↗</a>',"GitHub-based tracker",["Maintain a GitHub-based tracker of solved problems for a class of 41 students to keep DSA practice consistent."],"338+ commits")
+   +'</div></section>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Achievements</h2></div><div class="rs-list">'
+     +item("Achievements",null,["Published at ICACIT 2025 (Asteroid Impact Detection System).","36-hour hackathon, NIT Trichy: built \"Counterfactual Classroom\", a causal uplift model on the OULAD dataset.","Hackathon, VIT Vellore: ECG arrhythmia classification at 91.3% cross-validated accuracy."])
+   +'</div></section>'
+   +'<section class="rs-sec"><div class="sec-h"><h2>Certificates</h2><a href="#profile" data-go="profile" data-after="certs">View with filters →</a></div><div class="rs-list">'
+     +CERTS.map(function(c){ return item(esc(c.t), esc(c.org)+(c.note?" · "+esc(c.note):""), null, esc(c.date)); }).join("")
+   +'</div></section>';
+}
+
+/* repos view */
+var lang = "All", dom = "All";
+var LANGS = ["All","HTML","JavaScript","Python"];
+var DOMS = ["All","Computer vision","Medical AI","Full-stack","Real-time","Research","Practice & tooling"];
+function renderList(){
+  var q = $("#q").value.trim().toLowerCase();
+  var list = REPOS.filter(function(r){
+    return (lang==="All"||r.l===lang) && (dom==="All"||r.c.indexOf(dom)>=0)
+      && (!q || (r.n+" "+r.d+" "+r.t.join(" ")).toLowerCase().indexOf(q)>=0);
+  });
+  $("#repo-list").innerHTML = list.map(card).join("");
+  $("#none").hidden = list.length>0;
+  $("#repo-note").innerHTML = 'Showing '+list.length+' of '+REPOS.length+' public repositories. <a href="'+U+'?tab=repositories" target="_blank" rel="noopener" style="color:var(--mint)">View on GitHub ↗</a>';
+}
+function pills(id,items,get,onPick){
+  var box = $(id);
+  box.innerHTML = items.map(function(x,i){ return '<button class="pill'+(i===0?" on":"")+'" type="button" data-v="'+esc(x)+'">'+esc(x)+(get?'<small>'+get(x)+'</small>':'')+'</button>'; }).join("");
+  box.addEventListener("click",function(e){
+    var b = e.target.closest("[data-v]"); if(!b) return;
+    $$(".pill",box).forEach(function(p){ p.classList.toggle("on", p===b); });
+    onPick(b.dataset.v); renderList();
+  });
+}
+pills("#langs",LANGS,function(l){ return l==="All"?REPOS.length:REPOS.filter(function(r){return r.l===l}).length; },function(v){ lang=v; });
+pills("#doms",DOMS,function(d){ return d==="All"?REPOS.length:REPOS.filter(function(r){return r.c.indexOf(d)>=0}).length; },function(v){ dom=v; });
+$("#q").addEventListener("input",renderList);
+
+/* language mix */
+function renderMix(){
+  var counts = {}, order = [];
+  REPOS.forEach(function(r){ var k = r.l||"Other"; if(!counts[k]){ counts[k]=0; order.push(k); } counts[k]++; });
+  order.sort(function(a,b){ return a==="Other"?1:b==="Other"?-1:counts[b]-counts[a]; });
+  var col = function(k){ return LANG[k]||"#6b6485"; };
+  $("#langmix").innerHTML = '<div class="lm-bar" role="img" aria-label="Language mix across '+REPOS.length+' repositories">'
+    +order.map(function(k){ return '<i style="flex:'+counts[k]+';background:'+col(k)+'" title="'+k+': '+counts[k]+'"></i>'; }).join("")+'</div>'
+    +'<div class="lm-leg">'+order.map(function(k){ return '<span><i class="dot" style="background:'+col(k)+'"></i><b>'+k+'</b> '+counts[k]+' '+(counts[k]===1?"repo":"repos")+'</span>'; }).join("")+'</div>';
+}
+
+/* accent colour */
+var ACCENTS = [["Violet","#7b5cff"],["Blue","#3b82f6"],["Pink","#ec4899"],["Amber","#f59e0b"],["Green","#22c55e"]];
+function hex2rgb(h){ return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]; }
+function mixc(a,b,t){ return "rgb("+a.map(function(v,i){ return Math.round(v+(b[i]-v)*t); }).join(",")+")"; }
+function lum(c){ var f=c.map(function(v){ v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); }); return 0.2126*f[0]+0.7152*f[1]+0.0722*f[2]; }
+function setAccent(hex){
+  var c = hex2rgb(hex), st = document.documentElement.style, base = [27,22,38];
+  st.setProperty("--accent",hex); st.setProperty("--accent-rgb",c.join(","));
+  st.setProperty("--l1",mixc(base,c,.3)); st.setProperty("--l2",mixc(base,c,.58)); st.setProperty("--l3",mixc(base,c,.85)); st.setProperty("--l4",mixc(c,[255,255,255],.45));
+  var L = lum(c); st.setProperty("--on-accent",(1.05/(L+.05))>=((L+.05)/.054)?"#fff":"#0d0a14");
+  ACC = c.join(",");
+  $$("#sw button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.c===hex?"true":"false"); });
+}
+function initAccent(){
+  var sw = $("#sw");
+  sw.innerHTML = ACCENTS.map(function(a){ return '<button type="button" data-c="'+a[1]+'" aria-label="'+a[0]+' accent" title="'+a[0]+'" style="background:'+a[1]+'"></button>'; }).join("");
+  sw.addEventListener("click",function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    setAccent(b.dataset.c);
+    try{ localStorage.setItem("dp-accent",b.dataset.c); }catch(x){}
+  });
+  var saved = null; try{ saved = localStorage.getItem("dp-accent"); }catch(x){}
+  setAccent(ACCENTS.some(function(a){ return a[1]===saved; }) ? saved : ACCENTS[0][1]);
+}
+
+/* tilt */
+var tl = $(".tilt");
+if(!RM && window.matchMedia("(hover:hover)").matches){
+  tl.addEventListener("mousemove",function(e){
+    var b = tl.getBoundingClientRect(), x=(e.clientX-b.left)/b.width-.5, y=(e.clientY-b.top)/b.height-.5;
+    tl.style.transform = "perspective(900px) rotateY("+(x*8)+"deg) rotateX("+(-y*8)+"deg)";
+  });
+  tl.addEventListener("mouseleave",function(){ tl.style.transform=""; });
+}
+
+/* dock magnification */
+var dock = $("#dock"), dks = $$(".dk");
+if(!RM && window.matchMedia("(hover:hover)").matches){
+  dock.addEventListener("mousemove",function(e){
+    dks.forEach(function(d){
+      var b = d.getBoundingClientRect(), dist = Math.abs(e.clientX-(b.left+b.width/2));
+      var s = 1 + 0.45*Math.max(0,1-dist/110);
+      d.style.transform = "scale("+s+")";
+    });
+  });
+  dock.addEventListener("mouseleave",function(){ dks.forEach(function(d){ d.style.transform=""; }); });
+}
+
+/* particle field */
+(function(){
+  var c = $("#bg"), x = c.getContext("2d"), W, H, P = [], m = {x:-999,y:-999};
+  function size(){ var r=window.devicePixelRatio||1; W=c.width=innerWidth*r; H=c.height=innerHeight*r; x.setTransform(1,0,0,1,0,0); x.scale(r,r); W=innerWidth; H=innerHeight; }
+  size(); addEventListener("resize",size);
+  var N = innerWidth<600 ? 36 : 80;
+  for(var i=0;i<N;i++) P.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.4+.4});
+  addEventListener("pointermove",function(e){ m.x=e.clientX; m.y=e.clientY; });
+  function draw(){
+    x.clearRect(0,0,W,H);
+    for(var i=0;i<P.length;i++){
+      var p=P[i];
+      if(!RM){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+        var dx=p.x-m.x, dy=p.y-m.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120 && d>0){ p.x+=dx/d*.9; p.y+=dy/d*.9; } }
+      x.fillStyle="rgba(190,170,255,.7)"; x.beginPath(); x.arc(p.x,p.y,p.r,0,6.283); x.fill();
+      for(var j=i+1;j<P.length;j++){
+        var q=P[j], ax=p.x-q.x, ay=p.y-q.y, dd=ax*ax+ay*ay;
+        if(dd<9000){ x.strokeStyle="rgba("+ACC+","+(0.18*(1-dd/9000))+")"; x.beginPath(); x.moveTo(p.x,p.y); x.lineTo(q.x,q.y); x.stroke(); }
+      }
+    }
+    if(!RM) requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* resume download */
+var toastT;
+function toast(msg){
+  var m = $("#dl-msg"); m.textContent = msg; m.style.opacity = 1;
+  clearTimeout(toastT); toastT = setTimeout(function(){ m.style.opacity = 0; },3200);
+}
+function setupDownload(){
+  $$("[data-dl]").forEach(function(b){ b.hidden = false; });
+  document.addEventListener("click",function(e){
+    if(!e.target.closest("[data-dl]")) return;
+    var a = document.createElement("a");
+    a.href = RESUME_PDF_URL; a.download = "Dhanvanth_Resume.pdf";
+    document.body.appendChild(a); a.click(); a.remove();
+    toast("Resume downloading.");
+  });
+}
+
+
+/* certifications: newest first, one object per certificate */
+var CERTS = [
+  {t:"Introduction to Python", org:"Infosys Springboard", kind:"Course", date:"1 Sep 2026", note:"Course completion certificate from Infosys Springboard.", tags:["Python","Fundamentals"]},
+  {t:"Adobe University Hackathon", org:"Adobe, via Unstop", kind:"Participation", date:"9 Aug 2026", note:"Certificate of Participation, taken as a small team.", tags:["Hackathon","Teamwork"]},
+  {t:"JavaScript Training Program", org:"Spoken Tutorial, IIT Bombay · EduPyramids, SINE", kind:"Course", date:"2 Mar 2026", note:"Online exam conducted remotely from IIT Bombay. Score 82.50%, 2 credits.", tags:["JavaScript","Web development"]},
+  {t:"Designing Intellibot (workshop)", org:"Sri Eshwar College of Engineering · Thiran 2026", kind:"Participation", date:"4–6 Feb 2026", note:"Workshop led by Mr. Guru Prasad, run by the Department of AI & DS. Covered sensor and controller selection and integrating hardware with AI.", tags:["AI & robotics","Autonomous systems"]},
+  {t:"Develop a Company Website with Wix", org:"Coursera Project Network", kind:"Project", date:"19 Sep 2025", note:"Project certificate: designing and structuring a business website with customisable templates, layouts and media.", tags:["Website development","Web design"]},
+  {t:"Creating a Free Business Page with Blogger", org:"Coursera Project Network", kind:"Project", date:"14 Sep 2025", note:"Project certificate: designing and customising a business page on Blogger.", tags:["Blogger","Digital presence"]},
+  {t:"NPTEL Elite Certificate: Human-Computer Interaction", org:"NPTEL, IIT Madras", kind:"Certification", date:"", note:"Scored 90%.", tags:["HCI"]}
+];
+var certKind = "All";
+var KIND_LABEL = {All:"All", Course:"Courses", Project:"Projects", Participation:"Participation", Certification:"Certification"};
+function renderCerts(){
+  var list = CERTS.filter(function(c){ return certKind==="All" || c.kind===certKind; });
+  $("#certs").innerHTML = list.map(function(c){
+    var tags = c.tags.length ? '<div class="topics">'+c.tags.map(function(x){ return '<span>'+esc(x)+'</span>'; }).join("")+'</div>' : "";
+    var t = c.url ? '<a href="'+esc(c.url)+'" target="_blank" rel="noopener">'+esc(c.t)+' ↗</a>' : esc(c.t);
+    return '<article class="rs-item spot"><header><h3>'+t+'</h3><span class="stack">'+esc(c.org)+'</span></header>'
+      +(c.note?'<div class="sub">'+esc(c.note)+'</div>':'')+tags
+      +'<div class="cert-f"><span class="badge kind">'+esc(c.kind)+'</span>'+(c.date?'<span>'+esc(c.date)+'</span>':'')+'</div></article>';
+  }).join("");
+}
+function initCerts(){
+  var kinds = ["All","Course","Project","Participation","Certification"], box = $("#cert-f");
+  box.innerHTML = kinds.map(function(k,i){
+    var n = k==="All" ? CERTS.length : CERTS.filter(function(c){ return c.kind===k; }).length;
+    return '<button class="pill'+(i===0?" on":"")+'" type="button" data-k="'+k+'">'+KIND_LABEL[k]+'<small>'+n+'</small></button>';
+  }).join("");
+  box.addEventListener("click",function(e){
+    var b = e.target.closest("[data-k]"); if(!b) return;
+    certKind = b.dataset.k;
+    $$(".pill",box).forEach(function(p){ p.classList.toggle("on", p===b); });
+    renderCerts();
+  });
+  $("#stat-certs").dataset.n = CERTS.length;
+  renderCerts();
+  $("#home-certs").innerHTML = CERTS.slice(0,3).map(function(c){
+    return '<article class="cc spot"><h3>'+esc(c.t)+'</h3><div class="org">'+esc(c.org)+'</div>'
+      +'<div class="cert-f"><span class="badge kind">'+esc(c.kind)+'</span>'+(c.date?'<span>'+esc(c.date)+'</span>':'')+'</div></article>';
+  }).join("");
+}
+
+/* contact form */
+var MAIL = "dhanvanthlinkedin@gmail.com";
+/* Direct delivery: paste a form-backend URL here (for example a Formspree endpoint that forwards to MAIL).
+   It only works once the page is hosted somewhere that allows outgoing requests, such as GitHub Pages.
+   Left empty, visitors send from their own email with the buttons below. */
+var ENDPOINT = "";
+function copyText(t){ return (navigator.clipboard && navigator.clipboard.writeText) ? navigator.clipboard.writeText(t) : Promise.reject(); }
+function initContact(){
+  var f = $("#cform"); if(!f) return;
+  var g = $("#c-gmail"), mt = $("#c-mailto"), cb = $("#c-copy"), hint = $("#c-hint"), msgEl = $("#c-msg"), send = $("#c-send");
+  var mail = {subject:"",body:""};
+  function setLink(a,href){
+    if(href){ a.setAttribute("href",href); a.setAttribute("aria-disabled","false"); }
+    else { a.removeAttribute("href"); a.setAttribute("aria-disabled","true"); }
+  }
+  function vals(){ return {name:$("#c-name").value.trim(), email:$("#c-email").value.trim(), org:$("#c-org").value.trim(), type:$("#c-type").value, msg:msgEl.value.trim()}; }
+  function missing(){
+    var v = vals(), need = [];
+    if(v.name.length<2) need.push("your name");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) need.push("a valid email so Dhanvanth can reply");
+    if(v.msg.length<20) need.push("a message of at least 20 characters");
+    return need;
+  }
+  function update(){
+    var v = vals(), need = missing();
+    $("#c-count").textContent = msgEl.value.length+" / 1500";
+    mail.subject = "["+v.type+"] Message from "+(v.name||"a visitor")+(v.org?" ("+v.org+")":"");
+    mail.body = v.msg+"\n\n"+v.name+(v.org?"\n"+v.org:"")+"\nReply to: "+v.email;
+    if(ENDPOINT) send.disabled = need.length>0;
+    if(need.length){
+      setLink(g,null); setLink(mt,null); cb.disabled = true;
+      hint.textContent = "Still needed: "+need.join(", ")+".";
+    } else {
+      setLink(g,"https://mail.google.com/mail/?view=cm&fs=1&to="+encodeURIComponent(MAIL)+"&su="+encodeURIComponent(mail.subject)+"&body="+encodeURIComponent(mail.body));
+      setLink(mt,"mailto:"+MAIL+"?subject="+encodeURIComponent(mail.subject)+"&body="+encodeURIComponent(mail.body));
+      cb.disabled = false;
+      hint.textContent = ENDPOINT ? "Ready. Press Send message." : "Ready. Open it in Gmail, then press Send there to deliver it.";
+    }
+  }
+  if(ENDPOINT){
+    send.hidden = false;
+    $("#c-note").textContent = "Send message delivers your note straight to Dhanvanth's inbox. If that fails, the Gmail and mail app buttons still work.";
+  }
+  f.addEventListener("input",update);
+  f.addEventListener("submit",function(e){
+    e.preventDefault();
+    if(!ENDPOINT || missing().length) return;
+    if($("#c-hp").value){ hint.textContent = "Message sent."; return; }
+    var v = vals();
+    send.disabled = true; send.textContent = "Sending…";
+    fetch(ENDPOINT,{method:"POST",headers:{"Accept":"application/json","Content-Type":"application/json"},
+      body:JSON.stringify({name:v.name,email:v.email,_replyto:v.email,company:v.org,topic:v.type,message:v.msg,_subject:mail.subject})})
+    .then(function(r){
+      if(!r.ok) throw new Error("status "+r.status);
+      f.reset(); update(); hint.textContent = "Message sent. Thank you."; toast("Message sent");
+    })
+    .catch(function(){
+      hint.textContent = "Couldn't send directly. Use Open in Gmail or Open in mail app instead.";
+    })
+    .then(function(){ send.textContent = "Send message"; send.disabled = missing().length>0; });
+  });
+  g.addEventListener("click",function(){ if(g.getAttribute("aria-disabled")==="false") toast("Gmail opened in a new tab. Press Send there to deliver your message."); });
+  cb.addEventListener("click",function(){
+    var full = "To: "+MAIL+"\nSubject: "+mail.subject+"\n\n"+mail.body;
+    copyText(full).then(function(){ toast("Message copied"); },function(){ toast("Copy is blocked here. Select the text and copy it."); });
+  });
+  update();
+}
+
+/* init */
+function dayKey(){ var d=new Date(); return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate(); }
+var curDay = dayKey();
+function greeting(h){ return h<5?"Working late":h<12?"Good morning":h<17?"Good afternoon":h<21?"Good evening":"Working late"; }
+function renderToday(){
+  var n = new Date();
+  $("#today").textContent = n.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+" · "+n.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+  $("#greet").textContent = greeting(n.getHours());
+}
+function checkDay(){ var k = dayKey(); if(k!==curDay){ curDay = k; renderToday(); heat(); } }
+setInterval(function(){ renderToday(); checkDay(); },30000);
+document.addEventListener("visibilitychange",function(){ renderToday(); checkDay(); });
+renderToday();
+initAccent(); initCerts(); initContact(); fillRepos(); heat(); renderMix(); renderList(); renderResume(); setupDownload();
+var h = (location.hash||"").replace("#","");
+show(VIEWS.indexOf(h)>=0 ? h : "home");
+})();
+</script>
