@@ -1,8 +1,4 @@
-<div align="center">
-
-<img src="assets/banner.svg" alt="Dhanvanth SenthilKumar, portfolio" width="100%">
-
-<br>
+## ✦ DHANVANTH SENTHIL KUMAR
 
 [![Live site](https://img.shields.io/badge/LIVE-dhanvanth1610.github.io-7b5cff?style=for-the-badge&logo=githubpages&logoColor=white)](https://dhanvanth1610.github.io/Dhanvanth-Portfolio/)
 [![GitHub](https://img.shields.io/badge/GitHub-Dhanvanth1610-0d0a14?style=for-the-badge&logo=github)](https://github.com/Dhanvanth1610)
